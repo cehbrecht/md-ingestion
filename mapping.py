@@ -505,7 +505,7 @@ class Mapper(object):
                   valarr=invalue[0].split()
               else:
                   print("flatten")
-                  valarr=list(self.flatten(invalue))
+                  valarr=list(self.flatten(invalue))[0].split()
            else:
               print("just split")
               valarr=invalue.split() ##HEW??? [invalue]
