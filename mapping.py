@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""mapping.py - class for B2FIND mapping : 
+"""mapping.py - class for B2FIND mapping :
   - Mapper    maps harvested and specific MD records onto B2FIND schema
 
 Copyright (c) 2013 Heinrich Widmann (DKRZ)
@@ -73,7 +73,7 @@ class Mapper(object):
         ## settings for pyparsing
         nonBracePrintables = ''
         unicodePrintables = ''.join(chr(c) for c in range(65536) if not chr(c).isspace())
-        
+
         for c in unicodePrintables: ## printables:
             if c not in '(){}[]':
                 nonBracePrintables = nonBracePrintables + c
@@ -126,12 +126,12 @@ class Mapper(object):
                 ## iterate through lines in file
                 for line in tsvfile:
                    geonamestab.append(line)
-                   
+
             return geonamestab
 
     def str_equals(self,str1,str2):
         """
-        performs case insensitive string comparison by first stripping trailing spaces 
+        performs case insensitive string comparison by first stripping trailing spaces
         """
         return str1.strip().lower() == str2.strip().lower()
 
@@ -203,7 +203,7 @@ class Mapper(object):
         # Return Values:
         # --------------
         # 1. (boolean)  result
-    
+
         try:
             resp = urlopen(url, timeout=10).getcode()
         except HTTPError as err:
@@ -220,11 +220,11 @@ class Mapper(object):
                 return False
         else:
             return True
- 
+
     def map_url(self, invalue):
         """
         Convert identifiers to data access links, i.e. to 'Source' (ds['url']) or 'PID','DOI' etc. pp
- 
+
         Copyright (C) 2015 by Heinrich Widmann.
         Licensed under AGPLv3.
         """
@@ -263,7 +263,7 @@ class Mapper(object):
 	                        iddict['url'] = reurl.group("url")##[0]
 	                elif id.startswith('irods'):
 	                    iddict['url'] = id
-	            
+
         except Exception as e :
             self.logger.critical('%s - in map_identifiers %s can not converted !' % (e,invalue))
             return {}
@@ -281,7 +281,7 @@ class Mapper(object):
     def map_lang(self, invalue):
         """
         Convert languages and language codes into ISO names
- 
+
         Copyright (C) 2014 Mikael Karlsson.
         Adapted for B2FIND 2014 Heinrich Widmann
         Licensed under AGPLv3.
@@ -321,11 +321,11 @@ class Mapper(object):
                 newvalue.append(mcountry.name)
 
         return newvalue
- 
+
     def map_geonames(self,invalue):
         """
         Map geonames to coordinates
- 
+
         Copyright (C) 2014 Heinrich Widmann
         Licensed under AGPLv3.
         """
@@ -351,7 +351,7 @@ class Mapper(object):
     def map_temporal(self,invalue):
         """
         Map date-times to B2FIND start and end time
- 
+
         Copyright (C) 2015 Heinrich Widmann
         Licensed under AGPLv3.
         """
@@ -364,7 +364,7 @@ class Mapper(object):
             invalue=invalue[0]
             if '@type' in invalue :
               if invalue['@type'] == 'single':
-                 if "date" in invalue :       
+                 if "date" in invalue :
                    desc+=' %s : %s' % (invalue["@type"],invalue["date"])
                    return (desc,self.date2UTC(invalue["date"]),self.date2UTC(invalue["date"]))
                  else :
@@ -392,16 +392,16 @@ class Mapper(object):
             outlist=list()
             if len(invalue) == 1 :
                 try:
-                    desc+=' point in time : %s' % self.date2UTC(invalue[0]) 
+                    desc+=' point in time : %s' % self.date2UTC(invalue[0])
                     return (desc,self.date2UTC(invalue[0]),self.date2UTC(invalue[0]))
                 except ValueError:
                     return (desc,None,None)
 ##                else:
-##                    desc+=': ( %s - %s ) ' % (self.date2UTC(invalue[0]),self.date2UTC(invalue[0])) 
+##                    desc+=': ( %s - %s ) ' % (self.date2UTC(invalue[0]),self.date2UTC(invalue[0]))
 ##                    return (desc,self.date2UTC(invalue[0]),self.date2UTC(invalue[0]))
             elif len(invalue) == 2 :
                 try:
-                    desc+=' period : ( %s - %s ) ' % (self.date2UTC(invalue[0]),self.date2UTC(invalue[1])) 
+                    desc+=' period : ( %s - %s ) ' % (self.date2UTC(invalue[0]),self.date2UTC(invalue[1]))
                     return (desc,self.date2UTC(invalue[0]),self.date2UTC(invalue[1]))
                 except ValueError:
                     return (desc,None,None)
@@ -435,6 +435,7 @@ class Mapper(object):
         Licensed under AGPLv3.
         """
 
+        print(f"check spatial={invalue}")
         self.logger.debug('invalue %s' % (invalue,))
 
         if not any(invalue) :
@@ -452,6 +453,7 @@ class Mapper(object):
                         self.logger.critical('Longitude %s is not in range [-180,180] nor in [0,360]' % lon)
 
             if invalue[1]==invalue[3] and invalue[2]==invalue[4] :
+                print(f"seems to be a point")
                 self.logger.info('[%s,%s] seems to be a point' % (invalue[1],invalue[2]))
                 if float(invalue[1]) > 0 : # northern latitude
                     desc+='(%-2.0fN,' % float(invalue[1])
@@ -462,6 +464,7 @@ class Mapper(object):
                 else : # western longitude
                     desc+='%-2.0fW)' % (float(invalue[2]) * -1.0)
             else:
+                print(f"seems to be a box")
                 self.logger.info('[%s,%s,%s,%s] seems to be a box' % (invalue[1],invalue[2],invalue[3],invalue[4]))
                 if float(invalue[1]) > 0 : # northern min latitude
                     desc+='(%-2.0fN-' % float(invalue[1])
@@ -478,29 +481,35 @@ class Mapper(object):
                 if float(invalue[4]) > 0 : # eastern max longitude
                     desc+='%-2.0fE)' % float(invalue[4])
                 else : # western max longitude
-                    desc+='%-2.0fW)' % (float(invalue[4]) * -1.0)              
+                    desc+='%-2.0fW)' % (float(invalue[4]) * -1.0)
 
+        print(f"desc={desc}")
         self.logger.info('Spatial description %s' % desc)
         return (desc,invalue[1],invalue[2],invalue[3],invalue[4])
- 
+
     def map_spatial(self,invalue,geotab):
         """
         Map coordinates to spatial
- 
+
         Copyright (C) 2014 Heinrich Widmann
         Licensed under AGPLv3.
         """
         desc=''
         pattern = re.compile(r";|\s+")
         try:
+           print(f"map spatial: {invalue}")
            self.logger.info('   | Invalue:\t%s' % invalue)
            if isinstance(invalue,list) :
               if len(invalue) == 1:
+                  print("one value")
                   valarr=invalue[0].split()
               else:
-                  valarr=self.flatten(invalue)
+                  print("flatten")
+                  valarr=list(self.flatten(invalue))
            else:
+              print("just split")
               valarr=invalue.split() ##HEW??? [invalue]
+           print(f"valarr={valarr}")
            self.logger.info('   | Valarr:\t%s' % valarr)
            coordarr=list()
            nc=0
@@ -519,30 +528,33 @@ class Mapper(object):
                   if self.is_float_try(val) is True :
                       coordarr.append(val)
                       nc+=1
+           print(f"coordarr={coordarr}, nc={nc}")
            if nc==2 :
               retValue = (desc,coordarr[0],coordarr[1],coordarr[0],coordarr[1])
            elif nc==4 :
               retValue = (desc,coordarr[0],coordarr[1],coordarr[2],coordarr[3])
            elif desc :
-              retValue = (desc,None,None,None,None) 
+              retValue = (desc,None,None,None,None)
            else :
-              retValue = (None,None,None,None,None) 
+              retValue = (None,None,None,None,None)
 
            if len(coordarr)==2 :
               retValue = (desc,coordarr[0],coordarr[1],coordarr[0],coordarr[1])
            elif len(coordarr)==4 :
               retValue = (desc,coordarr[0],coordarr[1],coordarr[2],coordarr[3])
+           print(f"retValue={retValue}")
 
         except Exception as e :
+           print(f"excpetion: {e}")
            self.logger.error('%s : %s can not converted !' % (e,retValue))
-           retValue = (None,None,None,None,None) 
+           retValue = (None,None,None,None,None)
         ##print('KKKKKKKKKKKK %s' % (self.check_spatial(retValue,geotab)),)
         return self.check_spatial(retValue,geotab)
 
     def map_checksum(self,invalue):
         """
         Filter out md checksum from value list
- 
+
         Copyright (C) 2016 Heinrich Widmann
         Licensed under AGPLv3.
         """
@@ -552,20 +564,20 @@ class Mapper(object):
         else:
             inlist=invalue
 
-        for inval in inlist: 
-            if re.match("[a-fA-F0-9]{32}",inval) : ## checks for MD5 checksums !!! 
-                return inval  
+        for inval in inlist:
+            if re.match("[a-fA-F0-9]{32}",inval) : ## checks for MD5 checksums !!!
+                return inval
 
         return None
 
     def map_discipl(self,invalue,disctab):
         """
         Convert disciplines along B2FIND disciplinary list
- 
+
         Copyright (C) 2014 Heinrich Widmann
         Licensed under AGPLv3.
         """
-        
+
         retval=list()
         if type(invalue) is not list :
             inlist=re.split(r'[;&\s]\s*',invalue)
@@ -581,7 +593,7 @@ class Mapper(object):
             maxr=0.0
             maxdisc=''
             for line in disctab :
-                line=re.split(r'#', line) 
+                line=re.split(r'#', line)
                 try:
                     if len(line) < 3:
                         self.logger.critical('Missing base element in dicipline array %s' % line)
@@ -612,12 +624,12 @@ class Mapper(object):
             retval=list(OrderedDict.fromkeys(retval)) ## this elemenates real duplicates
             return (';'.join(retval),rethier)
         else:
-            return ('Various',list()) 
-   
+            return ('Various',list())
+
     def cut(self,invalue,pattern,nfield=None):
         """
-        Invalue is expected as list (if is not, it is splitted). 
-        Loop over invalue and for each elem : 
+        Invalue is expected as list (if is not, it is splitted).
+        Loop over invalue and for each elem :
            - If pattern is None truncate characters specified by nfield (e.g. ':4' first 4 char, '-2:' last 2 char, ...)
            - else if pattern is in invalue, split according to pattern and return field nfield (if 0 return the first found pattern),
            - else return invalue.
@@ -656,7 +668,7 @@ class Mapper(object):
     def list2dictlist(self,invalue,valuearrsep):
         """
         transfer list of strings/dicts to list of dict's { "name" : "substr1" } and
-          - eliminate duplicates, numbers and 1-character- strings, ...      
+          - eliminate duplicates, numbers and 1-character- strings, ...
         """
 
         dictlist=[]
@@ -681,7 +693,7 @@ class Mapper(object):
                     else:
                         valarr=list(lentry.values())
                 elif re.search(r"[\n&,;+]+",lentry) :
-                    valarr=re.split(r"[\n&,;+]+",lentry)                    
+                    valarr=re.split(r"[\n&,;+]+",lentry)
                 elif isinstance(lentry,str) :
                     valarr= [ lentry ]
                 else :
@@ -757,7 +769,7 @@ class Mapper(object):
 
     def splitstring2dictlist(self,dataset,facetName,valuearrsep,entrysep):
         """
-        split string in list of string and transfer to list of dict's [ { "name1" : "substr1" }, ... ]      
+        split string in list of string and transfer to list of dict's [ { "name1" : "substr1" }, ... ]
         """
 
         # read in list of stopwords
@@ -775,17 +787,17 @@ class Mapper(object):
                entrywords = entry.split()
                resultwords  = [word for word in entrywords if word.lower() not in stopwords]
                print ('resultwords %s' % resultwords)
-               entrydict={ "name": ' '.join(resultwords).replace('/','-') }  
+               entrydict={ "name": ' '.join(resultwords).replace('/','-') }
                dicttagslist.append(entrydict)
-       
+
             dataset[facet]=dicttagslist
-        return dataset       
+        return dataset
 
 
     def changeDateFormat(self,dataset,facetName,old_format,new_format):
         """
         changes date format from old format to a new format
-        current assumption is that the old format is anything (indicated in the 
+        current assumption is that the old format is anything (indicated in the
         config file by * ) and the new format is UTC
         """
         for facet in dataset:
@@ -800,7 +812,7 @@ class Mapper(object):
     def normalize(self,x):
         """normalize the path expression; outside jsonpath to allow testing"""
         subx = []
-    
+
         # replace index/filter expressions with placeholders
         # Python anonymous functions (lambdas) are cryptic, hard to debug
         def f1(m):
@@ -810,22 +822,22 @@ class Mapper(object):
             ret = "[#%d]" % n
             return ret
         x = re.sub(r"[\['](\??\(.*?\))[\]']", f1, x)
-    
+
         # added the negative lookbehind -krhodes
         x = re.sub(r"'?(?<!@)\.'?|\['?", ";", x)
-    
+
         x = re.sub(r";;;|;;", ";..;", x)
-    
+
         x = re.sub(r";$|'?\]|'$", "", x)
-    
+
         # put expressions back
         def f2(m):
             g1 = m.group(1)
             return subx[int(g1)]
-    
+
         x = re.sub(r"#([0-9]+)", f2, x)
         return x
-    
+
     def keynormalize(self,iterable):
         """normalize all keys in iterable"""
         ##for k, v in iterable.items():
@@ -845,11 +857,11 @@ class Mapper(object):
        def s(x,y):
            """concatenate path elements"""
            return str(x) + ';' + str(y)
-   
+
        def isint(x):
            """check if argument represents a decimal integer"""
            return x.isdigit()
-   
+
        def as_path(path):
            """convert internal path representation to
               "full bracket notation" for PATH output"""
@@ -862,7 +874,7 @@ class Mapper(object):
                else:
                    p += "['%s']" % piece
            return p
-   
+
        def store(path, object):
            if result_type == 'VALUE':
                result.append(object)
@@ -872,7 +884,7 @@ class Mapper(object):
            else: # PATH
                result.append(as_path(path))
            return path
-   
+
        def trace(expr, obj, path):
             obj=self.keynormalize(obj)
             if debug: print ("trace", expr, "/", path)
@@ -916,7 +928,7 @@ class Mapper(object):
                         e = evalx(loc, obj)
                         trace(s(e,x), obj, path)
                         return
-    
+
                     # ?(filter_expression)
                     if loc.startswith("?(") and loc.endswith(")"):
                         if debug > 1: print ("filter", loc)
@@ -928,11 +940,11 @@ class Mapper(object):
                                 eval_result = evalx(loc, obj[int(key)])
                             if eval_result:
                                 trace(s(key, expr), obj, path)
-    
+
                         loc = loc[2:-1]
                         walk(loc, x, obj, path, f05)
                         return
-    
+
                     m = re.match(r'(-?[0-9]*):(-?[0-9]*):?(-?[0-9]*)$', loc)
                     if m:
                         if isinstance(obj, (dict, list)):
@@ -940,22 +952,22 @@ class Mapper(object):
                                 if x > y:
                                     return x
                                 return y
-    
+
                             def min(x,y):
                                 if x < y:
                                     return x
                                 return y
-    
+
                             objlen = len(obj)
                             s0 = m.group(1)
                             s1 = m.group(2)
                             s2 = m.group(3)
-    
+
                             # XXX int("badstr") raises exception
                             start = int(s0) if s0 else 0
                             end = int(s1) if s1 else objlen
                             step = int(s2) if s2 else 1
-    
+
                             if start < 0:
                                 start = max(0, start+objlen)
                             else:
@@ -964,11 +976,11 @@ class Mapper(object):
                                 end = max(0, end+objlen)
                             else:
                                 end = min(objlen, end)
-    
+
                             for i in range(start, end, step):
                                 trace(s(i, x), obj, path)
                         return
-    
+
                     # after (expr) & ?(expr)
                     if loc.find(",") >= 0:
                         # [index,index....]
@@ -977,7 +989,7 @@ class Mapper(object):
                             trace(s(piece, x), obj, path)
             else:
                 store(path, obj)
-    
+
        def walk(loc, expr, obj, path, funct):
             if isinstance(obj, list):
                 for i in range(0, len(obj)):
@@ -985,24 +997,24 @@ class Mapper(object):
             elif isinstance(obj, dict):
                 for key in obj:
                     funct(key, loc, expr, obj, path)
-    
+
        def evalx(loc, obj):
             """eval expression"""
-    
+
             if debug: print ("evalx", loc)
-    
+
             # a nod to JavaScript. doesn't work for @.name.name.length
             # Write len(@.name.name) instead!!!
             loc = loc.replace("@.length", "len(__obj)")
-    
+
             loc = loc.replace("&&", " and ").replace("||", " or ")
-    
+
             # replace !@.name with 'name' not in obj
             # XXX handle !@.name.name.name....
             def notvar(m):
                 return "'%s' not in __obj" % m.group(1)
             loc = re.sub("!@\.([a-zA-Z@_]+)", notvar, loc)
-    
+
             # replace @.name.... with __obj['name']....
             # handle @.name[.name...].length
             def varmatch(m):
@@ -1019,12 +1031,12 @@ class Mapper(object):
                 if elts[-1] == "length":
                     return "len(%s)" % brackets(elts[1:-1])
                 return brackets(elts[1:])
-    
+
             loc = re.sub(r'(?<!\\)(@\.[a-zA-Z@_.]+)', varmatch, loc)
-    
+
             # removed = -> == translation
             # causes problems if a string contains =
-    
+
             # replace @  w/ "__obj", but \@ means a literal @
             loc = re.sub(r'(?<!\\)@', "__obj", loc).replace(r'\@', '@')
             if not use_eval:
@@ -1037,10 +1049,10 @@ class Mapper(object):
             except Exception :
                 if debug: print (e)
                 return False
-    
+
             if debug: print ("->", v)
             return v
-    
+
        # body of jsonpath()
 
        # Get caller globals so eval can pick up user functions!!!
@@ -1050,7 +1062,7 @@ class Mapper(object):
            cleaned_expr = self.normalize(expr)
            if cleaned_expr.startswith("$;"):
                cleaned_expr = cleaned_expr[2:]
-           
+
            trace(cleaned_expr, obj, '$')
 
            if len(result) > 0:
@@ -1064,15 +1076,15 @@ class Mapper(object):
 
         dict_list.append({"key": key, "value": value})
         return value
-    
+
 
     def jsonmdmapper(self,dataset,jrules):
         """
         changes JSON dataset field values according to mapfile
-        """  
+        """
         format = 'VALUE'
         newds=dict()
-      
+
         for rule in jrules:
            if rule.startswith('#'):
              continue
@@ -1105,7 +1117,7 @@ class Mapper(object):
                 logging.debug(' %s:[ERROR] %s : processing rule %s : %s : %s' % (self.jsonmdmapper.__name__,e,field,jpath,value))
                 continue
         return newds
-      
+
     def evalxpath(self, obj, expr, ns):
         # returns list of selected entries from xml obj using xpath expr
         flist=re.split(r'[\(\),]',expr.strip())
@@ -1153,7 +1165,7 @@ class Mapper(object):
                 if field in ['oai_set','Source']: ## set default for mandatory fields !!
                     retval=['Not stated']
                 elif field in ['Discipline']: ## set default for mandatory fields !!
-                    retval=['Various']    
+                    retval=['Various']
                 self.logger.info("|- Next field entry {line:%<20s}".format(line=line))
             else:
                 xpath=''
@@ -1163,7 +1175,7 @@ class Mapper(object):
                     xpath=m3.group(3)
                     if xpath in ("true", "false"):
                         retval=xpath
-                    else:   
+                    else:
                         retval=[xpath]
                 elif m2:
                     xpath=m2.group(3)
@@ -1171,7 +1183,7 @@ class Mapper(object):
                 else:
                     self.logger.info(' |- Found no xpath expression => continue with next field')
                     continue
-                
+
                 self.logger.info(' |- Xpath rule %-10s\n |- Value %-10s' % (xpath,retval))
 
                 if retval and len(retval) > 0 :
@@ -1190,25 +1202,25 @@ class Mapper(object):
     def map(self,request): ### community,mdprefix,path,target_mdschema):
         ## map(MAPPER object, community, mdprefix, path) - method
         # Maps XML files formated in source specific MD schema/format (=mdprefix)
-        #   to JSON files formatted in target schema (by default B2FIND schema) 
+        #   to JSON files formatted in target schema (by default B2FIND schema)
         # For each file two steps are performed
-        #  1. select entries by Python XPATH converter according 
-        #      the mapfile [<community>-]<mdprefix>.xml . 
-        #  2. perform generic and semantic mapping 
+        #  1. select entries by Python XPATH converter according
+        #      the mapfile [<community>-]<mdprefix>.xml .
+        #  2. perform generic and semantic mapping
         #        versus iso standards and closed vovabularies ...
         #
         # Parameters:
         # -----------
-        # 1. (list)     request -  specifies the processing parameters as <communtiy>, <mdprefix> etc. 
+        # 1. (list)     request -  specifies the processing parameters as <communtiy>, <mdprefix> etc.
         # 2. (string, optinal)   target_mdschema - specifies the schema the inpted records are be mapped to
         #
         # Return Values:
         # --------------
         # 1. (dict)     results statistics
-    
+
         resKeys=['count','tcount','ecount','time']
         results = dict.fromkeys(resKeys,0)
-        
+
         # set processing parameters
         community=request[0]
         source=request[1]
@@ -1282,7 +1294,7 @@ class Mapper(object):
                         self.logger.warning('\t |- Subdirectory %s with timestamp newer than fromdate %s is processed' % (subdir,self.fromdate))
                 else :
                     continue
-            elif not ( mdsubset == subdir or re.search(re.escape(mdsubset)+r'_\d+$', subdir)) :               
+            elif not ( mdsubset == subdir or re.search(re.escape(mdsubset)+r'_\d+$', subdir)) :
                 self.logger.error('\t |- Subdirectory %s does not match %s[_NN] - no processing required' % (subdir,mdsubset))
                 continue
             else:
@@ -1293,7 +1305,7 @@ class Mapper(object):
             inpath='%s/%s/%s' % (cmpath,subdir,insubdir)
             if not os.path.exists(inpath):
                 self.logger.critical('Can not access directory %s' % inpath)
-                return results     
+                return results
 
             # make output directory for mapped json's
             if (target_mdschema and not target_mdschema.startswith('#')):
@@ -1308,7 +1320,7 @@ class Mapper(object):
             oldperc=0
             err = None
             self.logger.debug(' |- Processing of %s files in %s' % (infformat.upper(),inpath))
-       
+
             ## start processing loop
             start = time.time()
             fcount=0 # counter per sub dir !
@@ -1324,7 +1336,7 @@ class Mapper(object):
                 self.logger.debug('    | m | %-4d | %-45s |' % (fcount,filename))
 
                 jsondata = dict()
-                infilepath=inpath+'/'+filename      
+                infilepath=inpath+'/'+filename
                 if ( os.path.getsize(infilepath) > 0 ):
                     ## load and parse raw xml rsp. json
                     with open(infilepath, 'r') as f:
@@ -1339,10 +1351,10 @@ class Mapper(object):
                             continue
                         else:
                             self.logger.debug(' |- Read file %s ' % infilepath)
- 
+
                     # get dataset id (CKAN name) from filename (a uuid generated identifier):
                     ds_id = os.path.splitext(filename)[0]
-                    self.logger.warning('    | u | %-4d | %-40s |' % (fcount,ds_id))                         
+                    self.logger.warning('    | u | %-4d | %-40s |' % (fcount,ds_id))
 
                     ## XPATH rsp. JPATH converter
                     if  mdprefix == 'json':
@@ -1359,7 +1371,7 @@ class Mapper(object):
                             # Run Python XPATH converter
                             self.logger.warning('    | xpathmapper | %-4d | %-45s |' % (fcount,os.path.basename(filename)))
                             jsondata=self.xpathmdmapper(xmldata,maprules,namespaces)
-                            reqpre = source + '?verb=GetRecord&metadataPrefix=' + mdprefix + '&identifier=' 
+                            reqpre = source + '?verb=GetRecord&metadataPrefix=' + mdprefix + '&identifier='
                         except Exception as e:
                             self.logger.error('%s during XPATH processing' % e)
                             results['ecount'] += 1
@@ -1369,7 +1381,7 @@ class Mapper(object):
                     if not 'oai_identifier' in jsondata :
                         self.logger.error("oai_identifier not mapped, set to ds_id : %s\n" % (ds_id))
                         jsondata['oai_identifier'] = [ds_id]
-                    
+
                     oai_id = jsondata['oai_identifier'][0]
                     self.logger.debug("        |-> identifier: %s\n" % (oai_id))
 
@@ -1460,9 +1472,9 @@ class Mapper(object):
                                     tempdesc,stime,etime=self.map_temporal(jsondata[facet])
                                     if tempdesc:
                                         jsondata[facet] = tempdesc
-                                elif facet == 'Language': 
+                                elif facet == 'Language':
                                     jsondata[facet] = self.map_lang(jsondata[facet])
-                                elif facet in ['Format']: 
+                                elif facet in ['Format']:
                                     jsondata[facet] = self.uniq(jsondata[facet])
                                 elif facet == 'PublicationYear':
                                     publdate=self.date2UTC(jsondata[facet])
@@ -1491,8 +1503,8 @@ class Mapper(object):
                         jsondata["spatial"]=spvalue
                     if stime and etime :
                         jsondata["TemporalCoverage:BeginDate"] = stime
-                        jsondata["TempCoverageBegin"] = self.utc2seconds(stime) 
-                        jsondata["TemporalCoverage:EndDate"] = etime 
+                        jsondata["TempCoverageBegin"] = self.utc2seconds(stime)
+                        jsondata["TemporalCoverage:EndDate"] = etime
                         jsondata["TempCoverageEnd"] = self.utc2seconds(etime)
                     if publdate :
                         jsondata["PublicationTimestamp"] = publdate
@@ -1507,7 +1519,7 @@ class Mapper(object):
                             self.logger.info('\t|<- %-10s : %-10s |' % (key,jsondata[key]))
                     ## write to JSON file
                     jsonfilename=os.path.splitext(filename)[0]+'.json'
-                
+
                     with io.open(outpath+'/'+jsonfilename, 'w') as json_file:
                         try:
                             self.logger.debug('decode json data')
@@ -1550,7 +1562,7 @@ class Mapper(object):
             string = last_line.split('INFO  Main ')[1]
             [results['count'], results['ecount']] = re.findall(r"\d{1,}", string)
             results['count'] = int(results['count']); results['ecount'] = int(results['ecount'])
-    
+
         return results
 
     def is_valid_value(self,facet,valuelist):
@@ -1607,9 +1619,9 @@ class Mapper(object):
             # to be continued for every other facet
 
             ##if errlist != '':
-            ##    print (' Following key-value errors fails validation:\n' + errlist 
+            ##    print (' Following key-value errors fails validation:\n' + errlist
             return vall
-                
+
     def json2xml(self,json_obj, line_padding="", mdftag="", mapdict="b2findfields"):
 
         result_list = list()
@@ -1625,7 +1637,7 @@ class Mapper(object):
         if json_obj_type is dict:
             for tag_name in json_obj:
                 sub_obj = json_obj[tag_name]
-                if tag_name in mapdict : 
+                if tag_name in mapdict :
                     tag_name=mapdict[tag_name]
                     if not isinstance(tag_name,list) : tag_name=[tag_name]
                     for key in tag_name:
@@ -1646,7 +1658,7 @@ class Mapper(object):
                 else:
                         self.logger.debug ('[WARNING] : Field %s can not mapped to B2FIND schema' % tag_name)
                         continue
-            
+
             return "\n".join(result_list)
 
         return "%s%s" % (line_padding, json_obj)
