@@ -16,3 +16,6 @@ oaidata_old/*
 results*.txt
 *.crt
 __pycache__/
+
+# generated json files
+oaitestdata/envidat-datacite/SET_1/json
