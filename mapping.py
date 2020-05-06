@@ -1465,9 +1465,12 @@ class Mapper(object):
                                 elif facet == 'SpatialCoverage':
                                     spdesc,slat,wlon,nlat,elon = self.map_spatial(jsondata[facet],geotab.geonames_list)
                                     if wlon and slat and elon and nlat :
+                                        print(f"setting spvalue")
                                         spvalue="{\"type\":\"Polygon\",\"coordinates\":[[[%s,%s],[%s,%s],[%s,%s],[%s,%s],[%s,%s]]]}" % (wlon,slat,wlon,nlat,elon,nlat,elon,slat,wlon,slat)
                                     if spdesc != None :
                                         jsondata[facet] = spdesc
+                                    print(f"spvalue={spvalue}")
+                                    print(f"spdesc={spdesc}")
                                 elif facet == 'TemporalCoverage':
                                     tempdesc,stime,etime=self.map_temporal(jsondata[facet])
                                     if tempdesc:
@@ -1501,6 +1504,9 @@ class Mapper(object):
 
                     if spvalue :
                         jsondata["spatial"]=spvalue
+                        print(f"set spatial spvalue={spvalue}")
+                    print(f'jsondata spatial = {jsondata.get("spatial")}')
+                    print("------")
                     if stime and etime :
                         jsondata["TemporalCoverage:BeginDate"] = stime
                         jsondata["TempCoverageBegin"] = self.utc2seconds(stime)

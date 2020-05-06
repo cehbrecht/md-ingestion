@@ -9,7 +9,7 @@ Moddifications :
   Heinrich Widmann @DKRZ 2015 : adapted to the new design of B2FIND mapper module
 
 HOW TO RUN
-$ ./mapper.py -i /path/to/input.[xml|json] -o /path/to/output.json [ -c /path/to/config.txt ] [ -m /path/to/xpath-mapfile.xml 
+$ ./mapper.py -i /path/to/input.[xml|json] -o /path/to/output.json [ -c /path/to/config.txt ] [ -m /path/to/xpath-mapfile.xml
 Input (mandatory) : xml or json file, depending on the this, total mapping (xml to json by JAVA XPATH2.0 converting + 'paostproc') or only 'postprocessing' (json to json) is performed
 Configuration file (this is a text file, where actions or rules are specified, In the scripts folder, you can see the format of the config.txt)
 Map file (this is a xml file, where xml to json converting is defined by XPATH2.= rules)
@@ -38,7 +38,7 @@ import B2FIND
 from B2FIND import CONVERTER as CV2
 import urllib.request, urllib.parse, urllib.error, mimetypes
 import lxml.etree as etree
- 
+
 def get_dataset(srcFile):
     """
     reads file from disk and returns json text
@@ -51,21 +51,21 @@ def get_dataset(srcFile):
        dataset = etree.tostring(etree.fromstring(text), pretty_print = True).encode('ascii', 'ignore')
        ##dataset = text.encode('ascii', 'ignore')
        ##print 'dataset %s ' % dataset
-       
+
     else :
        dataset = json.loads(text)
        mode=0
     return dataset
-    
+
 def get_conf(configFile):
     """
-    reads config file 
+    reads config file
     """
     f = codecs.open(configFile, "r", "utf-8")
     rules = f.readlines()[1:] # without the header
     rules = [x for x in rules if len(x) != 0] # removes empty lines
     return rules
-    
+
 def save_data(dataset,dstFile):
     """
     saves a json file
@@ -98,7 +98,7 @@ def main():
 	parser.add_argument('--configFile', metavar='CONFIGFILE',help='path to the postprocessing configuration file (if not given tried to derivate from input file name)')
 	parser.add_argument('--mapFile',help='path to a map file with xpath mapping rules (if not given tried to derivate from input file name)')
 	parser.add_argument('-j','--jobdir', help='path to log dir', default='log')
-	
+
 	# parse command line arguments
 	args = parser.parse_args()
         if not args.inFile:   # if inffile is not given
@@ -152,22 +152,22 @@ def main():
         now = time.strftime("%Y-%m-%d %H:%M:%S")
         jid = os.getpid()
         pstat=[]
-    
+
         # create logger and OUT output handler and initialise it:
         OUT = B2FIND.OUTPUT(pstat,now,jid,args)
 
         # create CONVERTER object:
         CV = B2FIND.CONVERTER(OUT)
-	
+
 	# read input and config files
  	dataset = get_dataset(inFile)
 
         global MapperVersion
         MapperVersion = '0.1'
         CV.logger.info('\nVersion:  \t%s' % MapperVersion)
-        if mode == 1: 
-            modetext='JAVA XPATH xml2json converting + Python json2json mapping' 
-        else : 
+        if mode == 1:
+            modetext='JAVA XPATH xml2json converting + Python json2json mapping'
+        else :
             modetext='Python json2json mapping'
         CV.logger.info('Run mode:   \t%s' % modetext)
         CV.logger.debug('Process ID:\t%s' % str(os.getpid()))
@@ -196,7 +196,7 @@ def main():
             print('out %s' % out)
             jsonfile=os.path.abspath('tmpdir/json')+'/'+os.path.splitext(xmlfile)[0]+'.json'
 
-            if err: 
+            if err:
                 print('[ERROR] %s' % err)
                 exit(1)
             else :
@@ -241,18 +241,21 @@ def main():
                     if type(extra['value']) is list:
                       extra['value']=CV.uniq(extra['value'])
                       if len(extra['value']) == 1:
-                        extra['value']=extra['value'][0] 
+                        extra['value']=extra['value'][0]
                     elif extra['key'] == 'Discipline':
                       extra['value'] = CV.map_discipl(extra['value'],disctab.discipl_list)
                     elif extra['key'] == 'Publisher':
                       extra['value'] = CV.cut(extra['value'],'=',2)
                       extra['value'] = CV.remove_duplicates(extra['value'])
                     elif extra['key'] == 'SpatialCoverage':
+                      print(f"mapper ... SpatialCoverage")
                       desc,slat,wlon,nlat,elon=CV.map_spatial(extra['value'])
+                      print(f"cv.map_spatial value={extra['value']}")
                       if wlon and slat and elon and nlat :
                         spvalue="{\"type\":\"Polygon\",\"coordinates\":[[[%s,%s],[%s,%s],[%s,%s],[%s,%s],[%s,%s]]]}" % (wlon,slat,wlon,nlat,elon,nlat,elon,slat,wlon,slat)
                       if desc :
                         extra['value']=desc
+                      print(f"mapper: spvalue={spvalue}, desc={desc}")
                     elif extra['key'] == 'TemporalCoverage':
                       desc,stime,etime=CV.map_temporal(extra['value'])
                       if desc:
@@ -270,7 +273,7 @@ def main():
                   CV.logger.info('    | [WARNING] %s : during mapping of field %s with value %s' % (e,extra['key'],extra['value']))
                   continue
         if publdate :
-                dataset['extras'].append({"key" : "PublicationTimestamp", "value" : publdate }) 
+                dataset['extras'].append({"key" : "PublicationTimestamp", "value" : publdate })
 
  	# save output json to file
 	save_data(dataset,outFile)
