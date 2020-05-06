@@ -1127,9 +1127,11 @@ class Mapper(object):
             if func.startswith('//'):
                 fxpath= '.'+re.sub(r'/text()','',func)
                 self.logger.debug('xpath %s' % fxpath)
+                # print(f"fxpath={fxpath}")
                 try:
                     for elem in obj.findall(fxpath,ns):
                         self.logger.debug(' //elem %s' % elem)
+                        # print(f"elem={elem}")
                         if elem.text :
                             self.logger.debug(' |- elem.text %s' % elem.text)
                             retlist.append(elem.text)
@@ -1180,6 +1182,8 @@ class Mapper(object):
                 elif m2:
                     xpath=m2.group(3)
                     retval=self.evalxpath(xmldata, xpath, namespaces)
+                    # if field == 'SpatialCoverage':
+                    #     print(f"field={field}, xpath={xpath}, retval={retval}")
                 else:
                     self.logger.info(' |- Found no xpath expression => continue with next field')
                     continue
@@ -1188,6 +1192,8 @@ class Mapper(object):
 
                 if retval and len(retval) > 0 :
                     jsondata[field]=retval ### .extend(retval)
+                    if field == 'SpatialCoverage':
+                        print(f"xpath mapper field={field} retval={retval}")
                     self.logger.info(' | %-10s | %10s | %20s | \n' % (field,xpath,retval[:20]))
                 elif field in ['oai_set']:
                     jsondata[field]=['Not stated']
