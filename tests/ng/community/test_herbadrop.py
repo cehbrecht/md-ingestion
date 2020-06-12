@@ -50,4 +50,4 @@ def test_json_metadata_access():
     jsonfile = os.path.join(TESTDATA_DIR, 'herbadrop-hjson', 'SET_1', 'hjson', '0d9e8478-3d92-5a5f-92cb-eb678e8e48dd.json')  # noqa
     mapper = Herbadrop(jsonfile)
     result = mapper.json()
-    assert 'https://opendata.cines.fr/herbadrop-api/rest/data/mnhnftp/P03945291' in result['MetadataAccess']
+    assert 'https://opendata.cines.fr/herbadrop-api/rest/data/mnhnftp/P03945291' in result['MetaDataAccess']
