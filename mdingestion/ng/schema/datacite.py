@@ -1,7 +1,7 @@
 import shapely
-import re
 
 from .base import OAIMapper
+from ..format import format_string_words
 
 
 class DataCite(OAIMapper):
@@ -18,8 +18,9 @@ class DataCite(OAIMapper):
     def tags(self):
         _tags = []
         for subject in self.find('subject'):
-            _subject = ' '.join(re.findall(r'\w+', subject))
-            _tags.append(dict(name=subject))
+            name = format_string_words(subject)
+            if name:
+                _tags.append(dict(name=name))
         return _tags
 
     @property
