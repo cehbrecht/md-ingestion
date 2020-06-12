@@ -287,7 +287,8 @@ class CKANMapper(BaseMapper):
             'name': self.community,
         }]
         _json['state'] = 'active'
-        _json['PublicationTimestamp'] = f"{self.publication_year[0]}-07-01T11:59:59Z"
+        if self.publication_year:
+            _json['PublicationTimestamp'] = f"{self.publication_year[0]}-07-01T11:59:59Z"
         return _json
 
 
@@ -299,6 +300,7 @@ class XMLMapper(CKANMapper):
     def find(self, name=None, type=None, one=False, **kwargs):
         tags = self.doc.find_all(name, **kwargs)
         formatted = [format.format(tag.text, type=type) for tag in tags]
+        formatted = [text.strip() for text in formatted if text.strip()]
         if one:
             if formatted:
                 value = formatted[0]
@@ -320,7 +322,10 @@ class XMLMapper(CKANMapper):
 
     @property
     def metadata_access(self):
-        mdaccess = f"{self.source}?verb=GetRecord&metadataPrefix={self.mdprefix}&identifier={self.oai_identifier[0]}"
+        if self.oai_identifier:
+            mdaccess = f"{self.source}?verb=GetRecord&metadataPrefix={self.mdprefix}&identifier={self.oai_identifier[0]}"  # noqa
+        else:
+            mdaccess = ''
         return mdaccess
 
 

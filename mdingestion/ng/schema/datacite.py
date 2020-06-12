@@ -1,4 +1,5 @@
 import shapely
+import re
 
 from .base import OAIMapper
 
@@ -17,7 +18,8 @@ class DataCite(OAIMapper):
     def tags(self):
         _tags = []
         for subject in self.find('subject'):
-             _tags.append(dict(name=subject))
+            _subject = ' '.join(re.findall(r'\w+', subject))
+            _tags.append(dict(name=subject))
         return _tags
 
     @property

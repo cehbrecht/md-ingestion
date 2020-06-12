@@ -4,4 +4,4 @@ from ..schema import DataCite
 class DarusDatacite(DataCite):
     @property
     def discipline(self):
-        return self.find('subject')
+        return self.find('subject', one=True)
