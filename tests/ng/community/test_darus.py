@@ -16,3 +16,5 @@ def test_datacite():
     assert '02baec53-8e79-5611-981e-11df59b824e4' == result['name']
     assert 'Medicine Health and Life Sciences' in [tag['name'] for tag in result['tags']]
     assert 'Medicine' == result['Discipline']
+    assert 'application/pdf' in result['Format']
+    assert len(result['Format']) == 2

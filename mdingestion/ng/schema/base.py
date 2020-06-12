@@ -7,6 +7,7 @@ from dateutil import parser as date_parser
 from pathlib import Path
 
 from .. import format
+from .. import util
 
 
 class ABCMapper(ABC):
@@ -301,6 +302,7 @@ class XMLMapper(CKANMapper):
         tags = self.doc.find_all(name, **kwargs)
         formatted = [format.format(tag.text, type=type) for tag in tags]
         formatted = [text.strip() for text in formatted if text.strip()]
+        formatted = util.remove_duplicates_from_list(formatted)
         if one:
             if formatted:
                 value = formatted[0]
