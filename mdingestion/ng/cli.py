@@ -76,7 +76,7 @@ def map(ctx, community, url, mdprefix, mdsubset):
 
 @cli.command()
 @click.option('--community', '-c', help='Community')
-@click.option('--iphost', help='IP address of CKAN instance')
+@click.option('--iphost', '-i', help='IP address of CKAN instance')
 @click.option('--auth', help='CKAN API key')
 @click.pass_context
 def upload(ctx, community, iphost, auth):
