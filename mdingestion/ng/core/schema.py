@@ -3,18 +3,20 @@ import colander
 
 class B2FSchema(colander.MappingSchema):
     community = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), validator=colander.Length(min=2)),
         name='community',
         title='Community',
         description='The scientific community, Research Infrastructure, Project or Data provider from which B2FIND harvests the metadata.',  # noqa
-        validator=colander.Length(min=1),
+        validator=colander.Length(min=1, max=1),
     )
     identifier = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), validator=colander.url),
         name='identifier',
         title='Identifier',
         description='A unique string that identifies a resource, ideally persistent. It may be a DOI, a PID or any other source.',  # noqa
-        validator=colander.url,
+        validator=colander.Length(min=1, max=1),
     )
     title = colander.SchemaNode(
         colander.Sequence(accept_scalar=True),
@@ -42,28 +44,31 @@ class B2FSchema(colander.MappingSchema):
         missing=colander.drop,
     )
     doi = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop, validator=colander.url),
         name='doi',
         title='DOI',
         description='A persistent, citable identifier that uniquely identifies a resource.',
         missing=colander.drop,
-        validator=colander.url,
+        validator=colander.Length(max=1),
     )
     pid = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop, validator=colander.url),
         name='pid',
         title='PID',
         description='A persistent identifier that uniquely identifies a resource.',
         missing=colander.drop,
-        validator=colander.url,
+        validator=colander.Length(max=1),
     )
     source = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop, validator=colander.url),
         name='source',
         title='Source',
         description='An identifier that uniquely identifies a resource. It may link to the data itself or a landing page that curates the data.',  # noqa
         missing=colander.drop,
-        validator=colander.url,
+        validator=colander.Length(max=1),
     )
     # TODO: related_identifier url validation is not working for herbadrop
     related_identifier = colander.SchemaNode(
@@ -75,12 +80,13 @@ class B2FSchema(colander.MappingSchema):
         missing=colander.drop,
     )
     metadata_access = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop, validator=colander.url),
         name='metadata_access',
         title='MetaDataAccess',
         description='Is a link to the originally harvested metadata record.',
         missing=colander.drop,
-        validator=colander.url,
+        validator=colander.Length(max=1),
     )
     creator = colander.SchemaNode(
         colander.Sequence(accept_scalar=True),
@@ -120,7 +126,7 @@ class B2FSchema(colander.MappingSchema):
         name='publication_year',
         title='PublicationYear',
         description='Year when the data is made publicly available. If an embargo period has been in effect, use the date when the embargo period ends.',  # noqa
-        validator=colander.Length(min=1),
+        validator=colander.Length(min=1, max=1),
     )
     funding_reference = colander.SchemaNode(
         colander.Sequence(accept_scalar=True),
@@ -139,11 +145,13 @@ class B2FSchema(colander.MappingSchema):
         missing=colander.drop,
     )
     open_access = colander.SchemaNode(
-        colander.Boolean(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.Boolean(), missing=colander.drop),
         name='open_access',
         title='OpenAccess',
         description='Information on whether the resource is openly accessible or not.',
         missing=colander.drop,
+        validator=colander.Length(max=1),
     )
     contact = colander.SchemaNode(
         colander.Sequence(accept_scalar=True),
@@ -187,30 +195,39 @@ class B2FSchema(colander.MappingSchema):
         missing=colander.drop,
     )
     version = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop),
         name='version',
         title='Version',
         description='Version information about the resource.',
         missing=colander.drop,
+        validator=colander.Length(max=1),
     )
     discipline = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop),
         name='discipline',
         title='Discipline',
         description='The research discipline(s) the resource can be categorized in.',
+        missing=colander.drop,
+        validator=colander.Length(max=1),
     )
     spatial_coverage = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop),
         name='spatial_coverage',
         title='SpatialCoverage',
         description='The spatial coverage the research data itself is related to. Content of this category is displayed in plain text. If a longitude/latitude information is given it will be displayed on the map.',  # noqa
         missing=colander.drop,
+        validator=colander.Length(max=1),
     )
     # NOTE: should enable both Date format and plain text like 'Viking age'
     temporal_coverage = colander.SchemaNode(
-        colander.String(),
+        colander.Sequence(accept_scalar=True),
+        colander.SchemaNode(colander.String(), missing=colander.drop),
         name='temporal_coverage',
         title='TemporalCoverage',
         description='Period of time the research data itself is related to. Could be a date format or plain text.',  # noqa
         missing=colander.drop,
+        validator=colander.Length(max=1),
     )

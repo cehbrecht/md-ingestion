@@ -35,12 +35,12 @@ def test_b2f_schema():
     }
     schema = B2FSchema()
     appstruct = schema.deserialize(cstruct)
-    assert 'https://doi.org/10.18419/does-not-exist' == appstruct['identifier']
+    assert 'https://doi.org/10.18419/does-not-exist' == appstruct['identifier'][0]
     assert 'A Title' == appstruct['title'][0]
-    assert 'http://localhost/b2f/alice_in_wonderland.txt' == appstruct['source']
+    assert 'http://localhost/b2f/alice_in_wonderland.txt' == appstruct['source'][0]
     assert 2020 == appstruct['publication_year'][0].year
-    assert appstruct['open_access'] is True
-    assert '2020-06-12T12:00:00Z' == appstruct['temporal_coverage']
+    assert appstruct['open_access'][0] is True
+    assert '2020-06-12T12:00:00Z' == appstruct['temporal_coverage'][0]
 
 
 def test_b2f_missing_title():
@@ -81,11 +81,10 @@ def test_b2f_doc_validation_darus():
     schema = B2FSchema()
     appstruct = schema.deserialize(cstruct)
     assert 'Deep enzymology data' in appstruct['title'][0]
-    assert 'https://doi.org/10.18419/darus-629' == appstruct['doi']
+    assert 'https://doi.org/10.18419/darus-629' == appstruct['doi'][0]
     assert 2020 == appstruct['publication_year'][0].year
 
 
-@pytest.mark.xfail(reason='related identifier url validation fails')
 def test_b2f_doc_validation_herbadrop():
     jsonfile = os.path.join(TESTDATA_DIR, 'herbadrop-hjson', 'SET_1', 'hjson', '0d9e8478-3d92-5a5f-92cb-eb678e8e48dd.json')  # noqa
     reader = Herbadrop()
@@ -95,7 +94,7 @@ def test_b2f_doc_validation_herbadrop():
     schema = B2FSchema()
     appstruct = schema.deserialize(cstruct)
     assert 'Gentiana ×marcailhouana Rouy' in appstruct['title'][0]
-    assert 'http://coldb.mnhn.fr/catalognumber/mnhn/p/p03945291' == appstruct['source']
+    assert 'http://coldb.mnhn.fr/catalognumber/mnhn/p/p03945291' == appstruct['source'][0]
     assert 2019 == appstruct['publication_year'][0].year
     assert 'ark:/87895/1.90-4070723' in appstruct['related_identifier'][0]
 

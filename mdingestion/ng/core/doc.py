@@ -157,7 +157,7 @@ class BaseDoc(object):
 
     @publication_year.setter
     def publication_year(self, value):
-        self._publication_year = format_value(value, type='date_year', one=True)
+        self._publication_year = format_value(value, type='date_year', max=1)
 
     @property
     def funding_reference(self):

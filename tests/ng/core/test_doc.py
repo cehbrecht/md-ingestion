@@ -1,6 +1,19 @@
 from mdingestion.ng.core import B2FDoc
 
 
+def test_doc_common_attributes():
+    doc = B2FDoc('test.json', community='test_b2f')
+    assert doc.community == 'test_b2f'
+    doc.publication_year = '2009-01-01'
+    assert doc.publication_year[0] == '2009'
+    doc.keywords = ['Social Sciences']
+    assert doc.keywords == ['Social Sciences']
+    doc.discipline = ['Social Sciences']
+    assert doc.discipline == 'Social Sciences'
+    doc.discipline = None
+    assert doc.discipline == 'Various'
+
+
 def test_doc_temporal_coverage():
     doc = B2FDoc('test.json')
     # begin

@@ -17,6 +17,7 @@ class FFReader(XMLReader):
         keywords = self.find('placeName.term')
         keywords.extend(self.find('objectType.term'))
         doc.keywords = keywords
+        doc.discipline = self.discipline(doc)
         # doc.discipline = self.discipline(doc)
         doc.related_identifier = []
         doc.creator = self.find('supervision.term')

@@ -21,7 +21,7 @@ def test_iso19139():
     assert 'marcus.schaub(at)wsl.ch' in doc.contact
     assert 'Swiss Federal Institute for Forest' in doc.publisher[0]
     # assert 'EnviDat' in doc.contributor
-    assert '2019' in doc.publication_year
+    assert '2019' in doc.publication_year[0]
     assert 'Other (Specified in the description)' in doc.rights
     assert 'English' in doc.language
     assert [] == doc.resource_type

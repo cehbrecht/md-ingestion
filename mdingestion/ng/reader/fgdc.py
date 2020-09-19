@@ -14,6 +14,7 @@ class FGDCReader(XMLReader):
         doc.title = self.find('title')
         doc.description = self.find('abstract')
         doc.keywords = self.find('themekey')
+        doc.discipline = self.discipline(doc)
         # doc.discipline = format_value(self.find('subject'), type='string_words')
         doc.source = self.find('onlink')
         # doc.related_identifier = self.find('relatedIdentifier')

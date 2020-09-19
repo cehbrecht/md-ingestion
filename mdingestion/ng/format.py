@@ -36,7 +36,16 @@ def is_null_value(text):
     return False
 
 
-def format_value(value, type=None, one=False, min_length=None, max_length=None):
+def format_value(value, type=None, one=False, max=None, min_length=None, max_length=None):
+    """
+    Format value.
+
+    type: string, date, url, ...
+    one: return a single value not a list
+    max: max number of elements in list
+    min_length: minimun string length
+    max_length: maximum string length
+    """
     # work with value list
     values = value or []
     if not isinstance(values, list):
@@ -60,7 +69,7 @@ def format_value(value, type=None, one=False, min_length=None, max_length=None):
         else:
             result = ''
     else:
-        result = formatted
+        result = formatted[:max]
     return result
 
 

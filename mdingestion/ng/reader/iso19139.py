@@ -16,6 +16,7 @@ class ISO19139Reader(XMLReader):
         doc.title = self.find('CI_Citation.title')
         doc.description = self.find('abstract')
         doc.keywords = self.find('keyword')
+        doc.discipline = self.discipline(doc)
         doc.creator = self.find('CI_ResponsibleParty.individualName')
         # doc.instrument = self.find('')
         doc.publisher = self.find('CI_ResponsibleParty.organisationName')
