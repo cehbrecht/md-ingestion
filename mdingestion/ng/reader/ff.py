@@ -46,7 +46,6 @@ class FFReader(XMLReader):
         coverage = f"{from_year} - {to_year}; {period}; {main_period}"
         return coverage
 
-
     def geometry(self):
         """
         parse datacite geometry.
